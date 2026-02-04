@@ -38,7 +38,9 @@ export function NoteEditor({ title, content, onTitleChange, onContentChange }: N
           value={content}
           onChange={(e) => onContentChange(e.target.value)}
           rows={12}
+          aria-describedby="content-hint"
         />
+        <span id="content-hint" className="visually-hidden">使用語音按鈕可進行語音輸入</span>
       </div>
     </div>
   );

@@ -5,11 +5,13 @@ import type { Note, ChecklistItem } from '../types';
 import { NoteEditor } from '../components/NoteEditor';
 import { ChecklistEditor } from '../components/ChecklistEditor';
 import { useDebounce } from '../hooks/useDebounce';
+import { useToast } from '../components/Toast';
 
 export function EditPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const noteId = id ? parseInt(id, 10) : null;
+  const { showToast } = useToast();
 
   const [note, setNote] = useState<Note | null>(null);
   const [title, setTitle] = useState('');
@@ -30,6 +32,7 @@ export function EditPage() {
       try {
         const data = await getNoteById(noteId);
         if (!data) {
+          showToast('找不到該筆記', 'warning');
           navigate('/');
           return;
         }
@@ -41,6 +44,7 @@ export function EditPage() {
         setIsInitialized(true);
       } catch (error) {
         console.error('Failed to load note:', error);
+        showToast('載入筆記失敗', 'error');
         navigate('/');
       } finally {
         setIsLoading(false);
@@ -48,7 +52,7 @@ export function EditPage() {
     };
 
     loadNote();
-  }, [noteId, navigate]);
+  }, [noteId, navigate, showToast]);
 
   // Auto-save with debounce
   const saveNote = useCallback(async () => {
@@ -65,10 +69,11 @@ export function EditPage() {
       await updateNote(noteId, updates);
     } catch (error) {
       console.error('Failed to save note:', error);
+      showToast('儲存失敗，請重試', 'error');
     } finally {
       setIsSaving(false);
     }
-  }, [note, noteId, title, content, items, isInitialized]);
+  }, [note, noteId, title, content, items, isInitialized, showToast]);
 
   const debouncedSave = useDebounce(saveNote, 500);
 
@@ -88,9 +93,11 @@ export function EditPage() {
     if (window.confirm('確定要刪除這個筆記嗎？')) {
       try {
         await deleteNote(noteId);
+        showToast('筆記已刪除', 'success');
         navigate('/');
       } catch (error) {
         console.error('Failed to delete note:', error);
+        showToast('刪除失敗，請重試', 'error');
       }
     }
   };

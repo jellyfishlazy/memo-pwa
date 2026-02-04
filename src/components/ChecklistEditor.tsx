@@ -34,7 +34,7 @@ export function ChecklistEditor({ title, items, onTitleChange, onItemsChange }: 
     addItem(newItemText);
   }, [newItemText, addItem]);
 
-  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleAddItem();
@@ -118,6 +118,7 @@ export function ChecklistEditor({ title, items, onTitleChange, onItemsChange }: 
                 className={`checklist-item-text ${item.checked ? 'checked' : ''}`}
                 value={item.text}
                 onChange={(e) => updateItemText(item.id, e.target.value)}
+                aria-label={`編輯項目: ${item.text}`}
               />
               <div className="checklist-item-actions">
                 <button
@@ -158,12 +159,14 @@ export function ChecklistEditor({ title, items, onTitleChange, onItemsChange }: 
             placeholder="新增項目..."
             value={newItemText}
             onChange={(e) => setNewItemText(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyDown}
+            aria-label="輸入新項目"
           />
           <button
             type="button"
             className="btn btn-primary"
             onClick={handleAddItem}
+            aria-label="新增項目到清單"
           >
             新增
           </button>

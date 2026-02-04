@@ -1,13 +1,18 @@
 import Dexie, { type EntityTable } from 'dexie';
 import type { Note } from './types';
 
-const db = new Dexie('NotesDatabase') as Dexie & {
-  notes: EntityTable<Note, 'id'>;
-};
+class NotesDatabase extends Dexie {
+  notes!: EntityTable<Note, 'id'>;
 
-db.version(1).stores({
-  notes: '++id, type, title, content, createdAt, updatedAt'
-});
+  constructor() {
+    super('NotesDatabase');
+    this.version(1).stores({
+      notes: '++id, type, title, content, createdAt, updatedAt'
+    });
+  }
+}
+
+const db = new NotesDatabase();
 
 export { db };
 

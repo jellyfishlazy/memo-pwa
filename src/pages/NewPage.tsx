@@ -5,11 +5,13 @@ import type { NoteType, ChecklistItem } from '../types';
 import { NoteEditor } from '../components/NoteEditor';
 import { ChecklistEditor } from '../components/ChecklistEditor';
 import { useDebounce } from '../hooks/useDebounce';
+import { useToast } from '../components/Toast';
 
 export function NewPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const typeParam = searchParams.get('type') as NoteType | null;
+  const { showToast } = useToast();
   
   const [type, setType] = useState<NoteType>(typeParam || 'note');
   const [title, setTitle] = useState('');
@@ -45,10 +47,11 @@ export function NewPage() {
       navigate(`/edit/${id}`, { replace: true });
     } catch (error) {
       console.error('Failed to save note:', error);
+      showToast('儲存筆記失敗，請重試', 'error');
     } finally {
       setIsSaving(false);
     }
-  }, [type, title, content, items, noteId, navigate]);
+  }, [type, title, content, items, noteId, navigate, showToast]);
 
   const debouncedSave = useDebounce(saveNote, 500);
 

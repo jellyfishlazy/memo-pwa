@@ -2,26 +2,33 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllNotes, searchNotes, deleteNote } from '../db';
 import { NotePreview } from '../components/NotePreview';
+import { useDebounceValue } from '../hooks/useDebounceValue';
+import { useToast } from '../components/Toast';
 import type { Note } from '../types';
 
 export function ListPage() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const { showToast } = useToast();
+  
+  // Debounce 搜尋查詢，避免每次輸入都觸發搜尋
+  const debouncedSearchQuery = useDebounceValue(searchQuery, 300);
 
   const loadNotes = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = searchQuery 
-        ? await searchNotes(searchQuery)
+      const data = debouncedSearchQuery 
+        ? await searchNotes(debouncedSearchQuery)
         : await getAllNotes();
       setNotes(data);
     } catch (error) {
       console.error('Failed to load notes:', error);
+      showToast('載入筆記失敗，請重試', 'error');
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery]);
+  }, [debouncedSearchQuery, showToast]);
 
   useEffect(() => {
     loadNotes();
@@ -30,11 +37,13 @@ export function ListPage() {
   const handleDelete = useCallback(async (id: number) => {
     try {
       await deleteNote(id);
+      showToast('筆記已刪除', 'success');
       await loadNotes();
     } catch (error) {
       console.error('Failed to delete note:', error);
+      showToast('刪除失敗，請重試', 'error');
     }
-  }, [loadNotes]);
+  }, [loadNotes, showToast]);
 
   return (
     <div className="page list-page">
@@ -49,6 +58,7 @@ export function ListPage() {
           placeholder="搜尋筆記..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          aria-label="搜尋筆記"
         />
       </div>
 

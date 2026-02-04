@@ -8,6 +8,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'icons/*.svg'],
+      devOptions: {
+        enabled: true
+      },
       manifest: {
         name: 'PWA 記事本',
         short_name: '記事本',
