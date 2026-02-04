@@ -10,6 +10,7 @@ export function ListPage() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [showAddMenu, setShowAddMenu] = useState(false);
   const { showToast } = useToast();
   
   // Debounce 搜尋查詢，避免每次輸入都觸發搜尋
@@ -62,15 +63,6 @@ export function ListPage() {
         />
       </div>
 
-      <div className="add-buttons">
-        <Link to="/new?type=note" className="btn btn-primary btn-large">
-          📝 新增記事
-        </Link>
-        <Link to="/new?type=checklist" className="btn btn-secondary btn-large">
-          ☑️ 新增清單
-        </Link>
-      </div>
-
       {isLoading ? (
         <div className="loading">載入中...</div>
       ) : notes.length === 0 ? (
@@ -80,7 +72,7 @@ export function ListPage() {
           ) : (
             <>
               <p>還沒有任何筆記</p>
-              <p>點擊上方按鈕開始新增！</p>
+              <p>點擊右下角的 + 按鈕開始新增！</p>
             </>
           )}
         </div>
@@ -94,6 +86,48 @@ export function ListPage() {
             />
           ))}
         </div>
+      )}
+
+      {/* 浮動新增按鈕 */}
+      <div className="fab-container">
+        {showAddMenu && (
+          <div className="fab-menu">
+            <Link 
+              to="/new?type=note" 
+              className="fab-menu-item"
+              onClick={() => setShowAddMenu(false)}
+            >
+              <span className="fab-menu-icon">📝</span>
+              <span className="fab-menu-label">新增記事</span>
+            </Link>
+            <Link 
+              to="/new?type=checklist" 
+              className="fab-menu-item"
+              onClick={() => setShowAddMenu(false)}
+            >
+              <span className="fab-menu-icon">☑️</span>
+              <span className="fab-menu-label">新增清單</span>
+            </Link>
+          </div>
+        )}
+        <button
+          type="button"
+          className={`fab ${showAddMenu ? 'fab-active' : ''}`}
+          onClick={() => setShowAddMenu(!showAddMenu)}
+          aria-label="新增筆記"
+          aria-expanded={showAddMenu}
+        >
+          <span className="fab-icon">+</span>
+        </button>
+      </div>
+
+      {/* 背景遮罩 */}
+      {showAddMenu && (
+        <div 
+          className="fab-overlay" 
+          onClick={() => setShowAddMenu(false)}
+          aria-hidden="true"
+        />
       )}
     </div>
   );
