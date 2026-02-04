@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { SpeechButton } from './SpeechButton';
 import type { ChecklistItem } from '../types';
 
@@ -15,6 +15,7 @@ function generateId(): string {
 
 export function ChecklistEditor({ title, items, onTitleChange, onItemsChange }: ChecklistEditorProps) {
   const [newItemText, setNewItemText] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const addItem = useCallback((text: string) => {
     if (!text.trim()) return;
@@ -28,6 +29,11 @@ export function ChecklistEditor({ title, items, onTitleChange, onItemsChange }: 
     
     onItemsChange([...items, newItem]);
     setNewItemText('');
+    
+    // 自動聚焦回輸入框，方便連續新增
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
   }, [items, onItemsChange]);
 
   const handleAddItem = useCallback(() => {
@@ -154,6 +160,7 @@ export function ChecklistEditor({ title, items, onTitleChange, onItemsChange }: 
 
         <div className="add-item-row">
           <input
+            ref={inputRef}
             type="text"
             className="input"
             placeholder="新增項目..."
