@@ -31,12 +31,13 @@ export function ChecklistEditor({ title, items, onTitleChange, onItemsChange }: 
     setNewItemText('');
     
     // 自動聚焦回輸入框，方便連續新增
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 0);
+    // 直接呼叫 focus() 以確保在手機上也能正常觸發鍵盤
+    inputRef.current?.focus();
   }, [items, onItemsChange]);
 
-  const handleAddItem = useCallback(() => {
+  const handleAddItem = useCallback((e?: React.MouseEvent) => {
+    // 防止按鈕搶走焦點，確保手機鍵盤不會收起
+    e?.preventDefault();
     addItem(newItemText);
   }, [newItemText, addItem]);
 
@@ -172,7 +173,8 @@ export function ChecklistEditor({ title, items, onTitleChange, onItemsChange }: 
           <button
             type="button"
             className="btn btn-primary"
-            onClick={handleAddItem}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => handleAddItem()}
             aria-label="新增項目到清單"
           >
             新增
