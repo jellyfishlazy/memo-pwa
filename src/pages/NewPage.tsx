@@ -76,9 +76,9 @@ export function NewPage() {
           ← 返回
         </button>
         <h1>{type === 'note' ? '新增記事' : '新增清單'}</h1>
-        <span className={`save-status ${isSaving ? 'saving' : ''}`}>
-          {isSaving ? '儲存中...' : ''}
-        </span>
+        {isSaving && (
+          <span className="save-status saving">儲存中...</span>
+        )}
       </header>
 
       {!typeParam && (
